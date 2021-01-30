@@ -1,7 +1,6 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+pub mod binding_def;
+pub mod expr;
+pub mod val;
+
+mod env;
+mod utils;
