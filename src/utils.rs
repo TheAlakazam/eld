@@ -2,12 +2,18 @@ pub(crate) fn extract_digits(s: &str) -> Result<(&str, &str), String> {
     take_while_result(|c| c.is_ascii_digit(), s, "expected digits".to_string())
 }
 
+const WHITESPACE: &[char] = &[' ', '\n'];
+
 pub(crate) fn extract_whitespace(s: &str) -> (&str, &str) {
-    take_while(|c| c == ' ', s)
+    take_while(|c| WHITESPACE.contains(&c), s)
 }
 
 pub(crate) fn extract_whitespace_result(s: &str) -> Result<(&str, &str), String> {
-    take_while_result(|c| c == ' ', s, "expected a space".to_string())
+    take_while_result(
+        |c| WHITESPACE.contains(&c),
+        s,
+        "expected whitespace".to_string(),
+    )
 }
 
 pub(crate) fn extract_ident(s: &str) -> Result<(&str, &str), String> {
@@ -112,7 +118,20 @@ mod tests {
     fn do_not_extract_spaces_when_input_does_not_start_with_them() {
         assert_eq!(
             extract_whitespace_result("blah"),
-            Err("expected a space".to_string()),
+            Err("expected whitespace".to_string()),
+        );
+    }
+
+    #[test]
+    fn exteact_newline_or_spaces() {
+        assert_eq!(extract_whitespace(" \n \n\nabc"), ("abc", " \n \n\n"));
+    }
+
+    #[test]
+    fn do_not_extract_spaces1_when_input_does_not_start_with_them() {
+        assert_eq!(
+            extract_whitespace_result("blah"),
+            Err("expected whitespace".to_string()),
         );
     }
 }

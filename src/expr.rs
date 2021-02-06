@@ -1,5 +1,6 @@
 pub mod binding_usage;
 pub mod block;
+use crate::env::Env;
 use crate::utils;
 use crate::val::Val;
 use binding_usage::BindingUsage;
@@ -68,9 +69,9 @@ impl Expr {
         Ok((s, Self::Operation { lhs, rhs, op }))
     }
 
-    pub(crate) fn eval(&self, env: &Env) -> Val {
+    pub(crate) fn eval(&self, env: &Env) -> Result<Val, String> {
         match self {
-            Self::Number(Number(n)) => Val::Number(*n),
+            Self::Number(Number(n)) => Ok(Val::Number(*n)),
             Self::Operation { lhs, rhs, op } => {
                 let Number(lhs) = lhs;
                 let Number(rhs) = rhs;
@@ -82,10 +83,10 @@ impl Expr {
                     Op::Div => lhs / rhs,
                 };
 
-                Val::Number(result)
+                Ok(Val::Number(result))
             }
             Self::BindingUsage(binding_usage) => binding_usage.eval(env),
-            _ => todo!(),
+            Self::Block(block) => block.eval(env),
         }
     }
 }
@@ -159,7 +160,7 @@ mod tests {
                 op: Op::Add,
             }
             .eval(&Env::default()),
-            Val::Number(20),
+            Ok(Val::Number(20)),
         );
     }
 
@@ -172,7 +173,7 @@ mod tests {
                 op: Op::Sub,
             }
             .eval(&Env::default()),
-            Val::Number(10),
+            Ok(Val::Number(10)),
         );
     }
 
@@ -185,7 +186,7 @@ mod tests {
                 op: Op::Mul,
             }
             .eval(&Env::default()),
-            Val::Number(100),
+            Ok(Val::Number(100)),
         );
     }
 
@@ -198,7 +199,7 @@ mod tests {
                 op: Op::Div,
             }
             .eval(&Env::default()),
-            Val::Number(2),
+            Ok(Val::Number(2)),
         );
     }
 
@@ -262,5 +263,16 @@ mod tests {
                 },
             )),
         );
+    }
+
+    #[test]
+    fn eval_block() {
+        assert_eq!(
+            Expr::Block(Block {
+                stmts: vec![Stmt::Expr(Expr::Number((Number(10))))],
+            })
+            .eval(&Env::default()),
+            Ok(Val::Number(10)),
+        )
     }
 }
