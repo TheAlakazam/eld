@@ -4,8 +4,8 @@ use crate::utils;
 
 #[derive(Debug, PartialEq)]
 pub struct BindingDef {
-    name: String,
-    val: Expr,
+    pub name: String,
+    pub val: Expr,
 }
 
 impl BindingDef {
@@ -29,8 +29,9 @@ impl BindingDef {
         ))
     }
 
-    pub(crate) fn eval(&self, env: &mut Env) {
-        env.store_binding(self.name.clone(), self.val.eval());
+    pub(crate) fn eval(&self, env: &mut Env) -> Result<(), String> {
+        env.store_binding(self.name.clone(), self.val.eval()?);
+        Ok(())
     }
 }
 
