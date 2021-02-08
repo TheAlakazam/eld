@@ -1,9 +1,9 @@
 use crate::val::Val;
 use crate::{env::Env, utils};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub(crate) struct BindingUsage {
-    pub(super) name: String,
+    pub(crate) name: String,
 }
 
 impl BindingUsage {
@@ -19,7 +19,7 @@ impl BindingUsage {
     }
 
     pub(super) fn eval(&self, env: &Env) -> Result<Val, String> {
-        env.get_binding_value(&self.name)
+        env.get_binding(&self.name)
     }
 }
 
